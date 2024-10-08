@@ -1,0 +1,434 @@
+---
+title: "Cibersort for single cell deconvolution of bulk data"
+author: "Menna Arafat"
+date:  "2024-3-30"
+output: html_document
+---
+
+```{r}
+
+if (!file.exists("output")) {
+  dir.create("output")
+}
+if (!file.exists("plots")) {
+  dir.create("plots")
+}
+```
+
+## load librariess
+
+```{r}
+ suppressPackageStartupMessages({ 
+library("RColorBrewer")
+library(magrittr)
+library(openxlsx)
+library(dplyr)
+library(tidyverse)
+library("MetaboAnalystR")
+library(stringr)
+library(reshape2)
+library(ggplot2)
+library(patchwork)
+library(ggpubr)
+library(scales)
+library(gplots)
+library(ggrepel)
+library(ggpubr)
+library(tibble)
+library("pheatmap")
+library("dichromat")
+library("RColorBrewer")
+library(viridis)
+library(ComplexHeatmap)
+library(circlize)
+library(dplyr)
+ })
+```
+
+## load data
+
+```{r}
+list.files()
+data= read.csv("data/for_downstream.csv") %>% column_to_rownames("X")
+colnames(data)= c(paste0("sample",1:5, "_Tumor"), paste0("sample",1:5, "_Normal"))
+data[1,]= c(rep("Tumor", 5),rep("Normal", 5))    
+metadata= data.frame(sample= colnames(data),
+                     condition= c(rep("Tumor", 5),rep("Normal", 5))  )
+#shuffle data (unpublished data)
+#rownames(data) <- sample(rownames(data))
+#write.csv(data, "data/for_downstream.csv")
+```
+
+## Normality check for metabolite distribution
+
+```{r}
+before_norom <- data.frame( data[-1,])
+before_norom <- mutate_all(before_norom, function(x) as.numeric(as.character(x)))
+```
+
+## apply shapiro test on the means of the metabolites
+
+```{r}
+shapiro.test(apply(before_norom, 1, mean, na.rm = TRUE))
+```
+
+## ---------------------------------------------
+## density plot
+### scale function apply z transformation column wise- to center the data (subtracts the mean of the column from each entry then divide by SD), then for the transformed data, we get the means of the metabolites  and plot its distribution
+```{r}
+png("plots/densityplot_before_norm.png", width= 3000, height= 3400, res= 900)
+
+plot(density(apply(scale(before_norom), 1, mean, na.rm = TRUE)),main = "Raw Data")  
+dev.off()
+```
+
+## ---------------------------------------------
+## qq-plot
+
+```{r}
+means<- data.frame(apply(before_norom, 1, mean, na.rm = TRUE))
+colnames(means) <- "value"
+
+
+qq_before <- ggplot(means , aes(sample  = value) ) + 
+  geom_qq(size = 2.5 , alpha= 0.7) + 
+  geom_qq_line(size = 0.7, colour="red" ) +
+  
+  theme( axis.line = element_line(colour = "black", 
+                                  size = 1, linetype = "solid")) + 
+
+  
+  theme(text=element_text(size=16, face = "bold")) +
+  
+  theme(  panel.background = element_rect(fill = "white",colour = "white")) + 
+  ylab("Intensity") + xlab("Theoretical")
+
+ggsave("plots/qq_before_norm.png",qq_before, dpi = 900, width = 10, height = 6.5)
+```
+
+## ----------------------------------------------------------------------------
+## Downstream analysis
+
+```{r}
+library("MetaboAnalystR")
+```
+
+## Metaboanalyst workflow
+
+```{r}
+mSet<-InitDataObjects("pktable", "stat", paired=FALSE)
+mSet<-Read.TextData(mSet, "data/for_downstream.csv", "colu", "disc")
+mSet<-SanityCheckData(mSet)
+
+mSet<-ReplaceMin(mSet)
+
+mSet<-PreparePrenormData(mSet)
+mSet<-Normalization(mSet, "NULL", "NULL", "LogNorm", ratio=FALSE)
+
+mSet<-PlotNormSummary(mSet, "plots/metabolites_norm", "png", 600, width=NA)
+mSet<-PlotSampleNormSummary(mSet, "plots/sample_norm", "png", 600, width=NA)
+```
+
+##  normality check
+
+```{r}
+x <- mSet$dataSet$norm
+means <- data.frame(apply(x, 2, mean))
+shapiro.test(means$apply.x..2..mean.)
+## write.csv(t(x), "autoscaled_metabo_data.csv")
+```
+
+
+
+```{r}
+
+png("plots/densityplot_after_norm.png", width= 3000, height= 3400, res= 900)
+plot(density(means$apply.x..2..mean.) , main = "After_normalization")
+dev.off()
+
+plot4= ggqqplot(means$apply.x..2..mean.)
+ggsave("plots/qq_plot_after_norm.png",plot4, dpi = 300, width = 9, height = 5.5)
+
+library(nortest)
+sf.test(means$apply.x..2..mean.)  #' ## Shapiro-Francia test for normality
+```
+
+##  1- Fold Change Analysis
+
+```{r}
+mSet<-FC.Anal(mSet, 2, 0, FALSE) #' ## Cancer/control
+```
+
+
+```{r}
+x <- mSet$analSet$fc
+fc = data.frame(FC = x$fc.all, 
+                log_FC = x$fc.log)
+
+write.csv(fc, "output/fold_change.csv", row.names = TRUE)
+
+fc$num= seq(1, nrow(fc))
+fc$color <- ifelse(fc$log_FC > log2(2), "Up",
+                     ifelse( fc$log_FC < -log2(2), "Down" ,"No-change" ))
+
+
+fc$color <- factor(fc$color , levels = c("Up", "No-change", "Down"))
+
+x <- ggplot(fc , aes(y = log_FC , x = num, colour = color)) + 
+  geom_point(size = 3, alpha = 0.7) +
+  theme( axis.line = element_line(colour = "black",  size = 1, linetype = "solid")) + 
+  theme(legend.background = element_rect(size=0.5, linetype="solid",  colour ="black")) + 
+  theme(legend.position="top") +
+  theme(text=element_text(size=16, face = "bold")) +
+  scale_color_manual(values=c( "#D11300", "#6b6b6b",  "#0070D1")) + 
+  theme(  panel.background = element_rect(fill = "white", colour = "white")) + 
+  theme(axis.text.x=element_blank(), axis.line.x=element_blank(),
+        axis.ticks.x=element_blank() , legend.title=element_blank()) +
+  geom_hline(yintercept=0, size=1.5, alpha=0.7)+
+  geom_hline(yintercept=log2(2), size=2, linetype="dashed", alpha=0.7) +
+  geom_hline(yintercept=-log2(2), size=2, linetype="dashed", alpha=0.7) + 
+  xlab("Metabolites") +
+  ylab("Log2FC") + scale_y_continuous(sec.axis = sec_axis(~./1)) #' ## add a second y axis, that is mirror to the first
+
+ggsave("plots/Fold_change_plot.jpeg",x, dpi = 600 , width = 9, height = 5.5)
+```
+
+## number of significant according to FC
+
+```{r}
+sum(fc == "Up" ) 
+sum(fc =="Down") 
+```
+
+
+##  2- wilcoxin Tests
+
+```{r}
+mSet<-Ttests.Anal(mSet, nonpar = T, threshp = 0.5, FALSE, TRUE, "fdr", FALSE) #change to threshp = 0.05 
+tt= mSet$analSet$tt$sig.mat %>% as.data.frame()
+tt$metabolites= gsub(".*;" , "", row.names(tt))
+write.csv(tt , "output/wilcoxin.csv" , row.names = TRUE)
+
+
+x <- read.csv("output/wilcoxin.csv", row.names = 1)
+x$num= seq(1, nrow(x))
+x$color <- ifelse(x$X.log10.p. > -log10(0.5) , "P_value < 0.05", "P_value > 0.05") #change to  -log10(0.5)
+x$Metabolite.name= row.names(x)
+x=  x %>%  separate(col= "Metabolite.name", into= c("ID", "Metabolites"), sep= ";")
+
+plot <- ggplot(x , aes(y = X.log10.p. , x = num, colour = color ,label = metabolites)) + 
+  geom_point(size = 3) + 
+  scale_color_manual(values=c("#0070D1", "#D11300")) + 
+  scale_fill_discrete(name = "") +
+  geom_text(size = 3, nudge_x = 0.1, nudge_y = 0.5 , angle = 90) + 
+  theme( axis.line = element_line(colour = "black",  size = 1, linetype = "solid")) + 
+  theme(legend.background = element_rect(size=0.5, linetype="solid",   colour ="black")) + 
+  theme(legend.position="top" , legend.title=element_blank()) +
+  theme(text=element_text(size=16, face = "bold")) +
+  theme(  panel.background = element_rect(fill = "white",   colour = "white")) + 
+  geom_hline(yintercept= -log10(0.05), size=1.5, linetype="dashed", alpha=0.7) +
+  theme(axis.text.x=element_blank(), axis.line.x=element_blank(),
+        axis.ticks.x=element_blank()) + 
+  xlab("Metabolites") +
+  ylab("-log10(P-value)") + scale_y_continuous(sec.axis = sec_axis(~./1)) 
+
+
+ggsave("plots/t_test_sig.jpeg",plot, dpi = 300, width = 6, height = 5)
+```
+
+## --------------------------------------------------------------------------------------
+##  3 - Volcano Plot (raw p-value)
+
+```{r}
+mSet<-Volcano.Anal(mSet, FALSE, 2, 0, nonpar= T, threshp = 0.5, TRUE, "fdr") #threshp = 0.05
+
+#x= read.csv("volcano_all.csv") %>% column_to_rownames("X")
+x <- mSet$analSet$volcano
+x <- data.frame(p_log= x$p.log, fc_log = x$fc.log)
+
+# for your analysis, change cut-off to log10(0.05) 
+x$Direction= ifelse( x$p_log > -log10(0.5) & x$fc_log > log2(2), "Up", 
+                     ifelse ( x$p_log > -log10(0.5) & x$fc_log < -log2(2), "Down", "Non-Significant"))
+
+table(x$Direction)
+x$metabolites= gsub( ".*?;\\s", "", row.names(x))
+
+xminma <- -10
+xmaxma <- 10
+
+yminma <- min(x$fc_log) 
+ymaxma <- max(x$fc_log) + 0.5
+
+volcano <- ggplot(x, aes(x = fc_log, y = p_log, colour = Direction, label= metabolites)) +
+  xlab('log2FC') + ylab('-log10(FDR)') +
+  geom_point(size = 1.2, alpha = 0.7) + geom_rug(alpha = 0.6) +
+  scale_x_continuous(limits = c(xminma, xmaxma)) +
+  theme_bw() + theme(legend.title = element_blank()) +
+  geom_vline(xintercept = -log2(2), linetype = "dotted") +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = -log10(0.05)) +
+  geom_vline(xintercept = log2(2), linetype = "dotted") +
+  scale_color_manual(values = c("Up" = "#88226AFF", "Down" = "#8C510A" , "Non-significant" = "grey44")) +
+  geom_text_repel(aes(label = metabolites), 
+                  size = 3, 
+                  max.overlaps = 20, 
+                  segment.color = "grey50")
+print(volcano)
+
+ggsave("plots/Volcanoplot.jpg" ,plot = volcano , dpi = 600 , width = 7 , height = 4)
+write.csv( x,"volcano_all.csv")
+```
+
+## ------------------------------------------------------------------
+## PCA
+
+```{r}
+mSet<-PCA.Anal(mSet)
+mSet<-PlotPCA2DScore(mSet, "plots/PCA_2D", "png", 150, width=NA, 1,2,0.95,0,0)
+pc <- mSet$analSet$pca$x
+write.csv(pc , "output/pca_score.csv" , row.names = TRUE)
+
+PCA_data <- read.csv("output/pca_score.csv" , row.names = 1)
+```
+
+## variance explained by PCs
+```{r}
+vars <- apply(PCA_data, 2, var)
+PC1_var <- round( ( var(PCA_data$PC1) / sum(vars) ) * 100, 1)
+PC2_var <- round( ( var(PCA_data$PC2) / sum(vars) ) * 100, 1)
+PC3_var <- round( ( var(PCA_data$PC3) / sum(vars) ) * 100, 1)
+
+PCA_data$sample <- gsub("IDA.", "", rownames(PCA_data)) 
+PCA_data$group <- ifelse(grepl("Tumor", PCA_data$sample,fixed = TRUE), "Tumor", "Ctrl")
+```
+
+## PCA_data$sample <- NULL
+
+```{r}
+x <- ggplot(PCA_data , aes( x = PC1, y = PC2, colour = group)) + 
+    geom_point(aes(colour=group, fill=group) ,alpha = 0.7, 
+             shape = 21,size = 4,colour = "black" , stroke = 1.5)+
+    stat_ellipse(aes(x=PC1, y=PC2, fill=group) ,level=0.95,geom="polygon",alpha=0.1) +
+    #geom_text(aes(label = sample), nudge_x = 0.2, nudge_y = 0.2, size = 4, color = "black") +
+    scale_color_manual(values = c("Tumor" = "#FDE725", "Ctrl" ="#2D708D")) +  
+    scale_fill_manual(values = c("Tumor" = "#FDE725", "Ctrl" ="#2D708D")) + 
+    theme( axis.line = element_line(colour = "black",  size = 1, linetype = "solid")) + 
+    theme(legend.background = element_rect(size=0.5, linetype="solid",   colour ="black")) + 
+    theme(legend.position="top" , legend.title=element_blank()) +
+    theme(text=element_text(size=16, face = "bold")) + 
+    theme(  panel.background = element_rect(fill = "white",    colour = "white") , 
+            panel.border = element_rect(colour = "black", fill=NA, size=1,   linetype = "solid") ,
+            panel.grid = element_line(colour = "grey", size = 0.1))+
+    ylab(paste0("PC2 ", "(", PC2_var , "%", ")")) + 
+    xlab(paste0("PC1 ", "(", PC1_var , "%" ,")"))
+
+print(x)
+
+ggsave("plots/ PCA_plot.png",x, dpi = 600, width = 10, height = 7)
+```
+
+## PLS-DA
+## change source code of a function
+
+```{r}
+
+library(pls)
+mSet<-PLSR.Anal(mSet, reg=TRUE)
+
+mSet<-PlotPLSPairSummary(mSet, "plots/pls_pair_0_", "png", 72, width=NA, 5)
+
+mSet<-PlotPLS2DScore(mSet, "plots/pls_score2d_0_", "png", 72, width=NA, 1,2,0.95,0,0)
+
+mSet<-PlotPLS3DScoreImg(mSet, "plots/pls_score3d_0_", "png", 72, width=NA, 1,2,3, 40)
+
+mSet<-PlotPLSLoading(mSet, "plots/pls_loading_0_", "png", 72, width=NA, 1, 2);
+
+mSet<-PLSDA.CV(mSet, "T",5, "Q2")
+
+mSet<-PlotPLS.Classification(mSet, "plots/pls_cv_0_", "png", 72, width=NA)
+
+mSet<-PlotPLS.Imp(mSet, "plots/pls_imp_0_", "png", 72, width=7, "vip", "Comp. 1", 15,  FALSE)
+
+mSet<-PLSDA.Permut(mSet, 100, "accu")
+
+mSet<-PlotPLS.Permutation(mSet, "plots/pls_perm_1_", "png", 72, width=NA)
+```
+
+s
+##  Perform sPLS-DA analysis
+
+```{r}
+mSet<-SPLSR.Anal(mSet, 5, 10, "same", "Mfold")
+
+##  Plot sPLS-DA overview
+mSet<-PlotSPLSPairSummary(mSet, "plots/spls_pair_0_", format = "png", dpi=72, width=NA, 5)
+
+##  Create 2D sPLS-DA Score Plot
+mSet<-PlotSPLS2DScore(mSet, "plots/spls_score2d_0_", format = "png", dpi=72, width=NA, 1, 2, 0.95, 1, 0)
+
+##  Create 3D sPLS-DA Score Plot
+mSet<-PlotSPLS3DScoreImg(mSet, "plots/spls_score3d_0_", format = "png", 72, width=NA, 1, 2, 3, 40)
+
+##  Create sPLS-DA loadings plot
+
+mSet<-PlotSPLSLoading(mSet, "plots/spls_loading_0_", format = "png", dpi=72, width=NA, 1,"overview")
+##  Perform cross-validation and plot sPLS-DA classification
+
+mSet<-PlotSPLSDA.Classification(mSet, "plots/spls_cv_0_", format = "png", dpi=72, width=NA)
+
+```
+
+## heatmap
+
+```{r}
+library("pheatmap")
+library("dichromat")
+library("RColorBrewer")
+library(viridis)
+library(ComplexHeatmap)
+library(circlize)
+library(dplyr)
+list.files()
+
+
+features=  read.csv("output/wilcoxin.csv") %>% dplyr::select("metabolites") %>% unlist() %>% unname()
+count= as.data.frame(data)
+count[]= lapply(count, as.numeric)
+heat_data = count[row.names(count) %in% features,] 
+heat_data= scale(heat_data)
+
+
+ta <- HeatmapAnnotation(
+  Condition = metadata[, c("condition")],
+  col = list(
+    Condition = c("Tumor" = "#9400D3" , "Normal" = "darkolivegreen")
+    
+  ),
+  annotation_height = unit(10, "mm")
+)
+
+heatmap  <- Heatmap(
+  matrix = as.matrix(heat_data),
+  name = "Normalized Express.data",
+  col = colorRamp2(c(-3,0, 3), c( "grey44","lightyellow2" , "#A84939")),
+  row_labels = substr(rownames(heat_data), 1, 25),
+  show_row_names = TRUE,
+  cluster_rows = TRUE,
+  cluster_columns = TRUE,
+  show_column_names = FALSE,
+  top_annotation  = ta,
+  heatmap_legend_param = list(
+    title_gp = gpar(fontsize = 12),  #' ##  Title text size
+    labels_gp = gpar(fontsize = 12), #' ##  Labels text size
+    legend_height = unit(5, "cm"),   #' ##  Height of the legend
+    legend_width = unit(1.5, "cm")   #' ##  Width of the legend
+  )
+) 
+
+print(heatmap)
+
+png("plots/DE_metabolites_heatmap.png",width = 4000, height = 3000, res = 600)
+draw(heatmap, annotation_legend_side =  "right")
+dev.off()
+```
+

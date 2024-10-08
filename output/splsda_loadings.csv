@@ -1,0 +1,170 @@
+"","comp 1","comp 2","comp 3","comp 4","comp 5"
+" l-Isoleucine",0.53829,0,0,0,0
+" Capric Acid",0.51599,0,0,0,0
+" Biotin",0.42399,0,0,0,0
+" Orotic acid",0.41691,0,0,0,0
+" (2R)-2,3-Dihydroxypropanoic acid",0.26713,0,0,0,0
+" Uracil",0.097949,0,0,0,0
+" Genistein",0.094657,0,0.020007,0,0
+" Thiamine",0.01542,0,0,0,0
+" 2,4-Di-tert-butylphenol",-0.013591,0,0,0,0
+" (2-oxo-2,3-dihydro-1H-indol-3-yl)acetic acid",-0.0086419,0,0,0,0.17756
+" Benzoic Acid",0,-0.60015,0,0,0
+" Kynurenic acid",0,-0.4755,0,0,0
+" Adenosine",0,-0.44134,0,0,0
+" Adenosine cyclic phosphate",0,-0.38799,0,0,0
+" 5'-Deoxy-5'-methylthioadenosine",0,-0.17194,0,0,0
+" 2'-Deoxyadenosine",0,-0.12427,0,0,0
+" N-Acetyl-L-aspartic acid",0,-0.1022,0,0,0
+" Codeine",0,-0.094867,0,0,0
+" gamma-Glutamylcysteine",0,-0.062368,0,0,0
+" 4-Hydroxybutanoic acid",0,-0.008136,0,0,0
+" Uric Acid",0,0,0,0,0
+" Phytosphingosine",0,0,0,0,-0.15295
+" Palmitoleic Acid",0,0,0,0,0
+" Elaidic Acid",0,0,0,0,0
+" Citramalic acid",0,0,0,0,-0.73262
+" trans-4-Hydroxycyclohexanecarboxylic acid",0,0,0,0,0
+" Theophylline",0,0,0,0,0
+" Oxindole",0,0,0,0,0
+" Pyridoxal",0,0,-0.0072014,0,0
+" Salicyluric acid",0,0,0,0,0
+" Nonanoic acid",0,0,0,0,0
+" N6-Acetyl-L-lysine",0,0,0,0,0
+" Methylmalonic acid",0,0,0,0,0
+" gamma-Linolenic acid",0,0,0,0,0
+" Butyric Acid",0,0,0,0,0
+" Chenodiol",0,0,0,0,0
+" Isopropyl Alcohol",0,0,0,0,0
+" Glutamic Acid",0,0,0,0,0
+" Adenine",0,0,0,0,0
+" 4-Guanidinobutyric acid",0,0,0,0,0
+" 2-Aminoethyl dihydrogen phosphate",0,0,0,0,0
+" Raffinose",0,0,-0.30266,0,0
+" 1-Hexadecanoyl-sn-glycero-3-phosphoethanolamine",0,0,0,0,0
+" Leucine",0,0,0,0,0
+" Lauric Acid",0,0,0,0,0
+" Stearic Acid",0,0,0,0,0
+" Taurocholic acid",0,0,0,0,0
+" Myristic Acid",0,0,0,0,0
+" 3-Methyl-L-histidine",0,0,0,0,0
+" N-acetylputrescine",0,0,0,0,0
+" Taurine",0,0,0,0,0
+" gamma-Tocopherol",0,0,0,0,0
+" 3-(3-Hydroxyphenyl)propanoic acid",0,0,0,0,0
+" Isovaleric acid",0,0,0,0,0
+" Palmitic Acid",0,0,0,0,0
+" Valine",0,0,0,0,0
+" 4-(Methylsulfanyl)-2-oxobutanoic acid",0,0,0,0,0
+" L-Homoarginine",0,0,0,0,0
+" 3-(3-sulfooxyphenyl)propanoic Acid",0,0,-0.28112,0,0
+" Cholic Acid",0,0,-0.50592,0,0
+" Alanylphenylalanine",0,0,0,0,0
+" Doconexent",0,0,0,0,0
+" creatinine",0,0,0,0,0
+" Caffeine",0,0,0,0,0
+" Xanthine",0,0,0,0,0
+" 2-Hydroxyglutaric acid",0,0,0,0,0.081589
+" Uridine",0,0,0,0,0
+" 12-Hydroxystearic acid",0,0,0,0,0
+" Azelaic Acid",0,0,0,0,0
+" Thymine",0,0,0,0,0
+" Glycocholic acid",0,0,-0.48728,0,0
+" Guanine",0,0,0,0,0
+" Phenylalanine",0,0,0,0,0
+" Proline",0,0,0,0,0
+" beta-D-glucopyranose",0,0,0,0,0
+" Cianidanol",0,0,0,0,0
+" Citraconic acid",0,0,0,0,-0.19719
+" Oleic Acid",0,0,0,0,0
+" Alanine",0,0,0,0.12881,0
+" Octanoic Acid",0,0,0,0,0
+" Guanosine",0,0,0,0,0
+" 2-(1H-indol-3-yl)acetaldehyde",0,0,0,0,0
+" Carnosine",0,0,0,0,-0.11991
+" N-acetylornithine",0,0,0,0,0
+" 3'-Hydroxycinnamic acid",0,0,0,0,0
+" Nicotinic acid",0,0,0,0,0
+" Phthalic acid",0,0,0,0,0
+" Gallic Acid",0,0,0,0,0
+" Adipic Acid",0,0,0,0,0.34346
+" Tyrosine",0,0,0,0.019396,0
+" Sucrose",0,0,0,0.69949,0
+" Citrulline",0,0,0,0,0
+" 2-(1-methyl-1H-imidazol-4-yl)acetic acid",0,0,0,0,0.037068
+" l-Pipecolic acid",0,0,0,0,0
+" Pseudouridine",0,0,0,0,0
+" L-Tartaric acid",0,0,0,0.28214,0
+" Lidocaine",0,0,0,0,0
+" Hypotaurine",0,0,0,0,0
+" L-Saccharopine",0,0,0,0,0
+" Isoleucylisoleucine",0,0,0,0,0
+" Levocarnitine",0,0,0,0,0
+" Apigenin",0,0,0,0,0
+" Riboflavin",0,0,0,0,0
+" Tryptophan",0,0,0,0,0
+" Arachidonic Acid",0,0,0,0,0
+" Ferulic acid",0,0,0,0.12388,0
+" Pantothenic Acid",0,0,0,0,0
+" Inosine",0,0,0,0,0
+" Glyoxylic acid",0,0,0,0,0
+" Cyclohexanecarboxylic acid",0,0,0,0,0
+" Tricarballylic acid",0,0,0,0,0
+" Naringenin",0,0,0,0,0
+" Indoxyl sulfate",0,0,0,0,0
+" Dihydrouracil",0,0,0,0,0
+" N-Acetyl-5-hydroxytryptamine",0,0,0,0,0
+" Histidine",0,0,0,0,0
+" 4-Pyridoxic acid",0,0,0,0,0
+" 4-Methyl-5-thiazoleethanol",0,0,0,0,0
+" Indole-3-acetic acid",0,0,0,0,0
+" 5-Methoxyindole-3-acetic acid",0,0,0,0,0
+" Arginine",0,0,0,0.25821,0
+" Pentadecanoic acid",0,0,0,0,0
+" Luteolin",0,0,0,0,0
+" 2-Hydroxy-4-methylvaleric acid",0,0,0,0,0
+" L-Argininosuccinic acid",0,0,0,0,0
+" Linoleic Acid",0,0,0,0,0
+" Pyridoxamine",0,0,0,0,0
+" 5-Hydroxyindole-3-acetic acid",0,0,0,0,0
+" L-cystathionine",0,0,0,0,-0.47072
+" Anserine",0,0,0,0.41713,0
+" cis-Cinnamic acid",0,0,0,0,0
+" Pimelic acid",0,0,0,0,0
+" Aspartic Acid",0,0,-0.35016,0,0
+" Daidzein",0,0,-0.08989,0,0
+" Piperidine",0,0,0,0,0
+" Leucyl-leucine",0,0,0,0,0
+" Glucose 6-phosphate",0,0,0,0,0
+" Thymidine",0,0,0,0,0
+" N-Acetyl-L-glutamic acid",0,0,0,0,0
+" Cytidine",0,0,0,0,0
+" Pyridoxine",0,0,0,0,0
+" Gluconic Acid",0,0,0,0,0
+" Dopamine",0,0,0,0,0
+" Sebacic Acid",0,0,0,0,0
+" Choline",0,0,0,0,0
+" 4-(Trimethylammonio)butanoate",0,0,0,0,0
+" (2S)-2-Hydroxybutanedioic acid",0,0,0,0,0
+" Methionine",0,0,-0.36566,0,0
+" L-Pyroglutamic acid",0,0,0,0,0
+" Biliverdine",0,0,0,0,0
+" S-adenosyl-L-homocysteine",0,0,0,0,0
+" 2,5-Dihydroxybenzoic acid",0,0,0,0,0
+" CID 790",0,0,0,0,0
+" Tridecanoic acid",0,0,0,0,0
+" Tyramine",0,0,0,0,0
+" N-Acetyl-L-phenylalanine",0,0,0,-0.27255,0
+" Salicylic Acid",0,0,0,0,0
+" 4-Aminobenzoic acid",0,0,0,0,0
+" Linolenic Acid",0,0,0,-0.14277,0
+" 3-Hydroxybenzoic acid",0,0,0,0,0
+" Kaempferol",0,0,0,-0.2519,0
+" Dehydroepiandrosterone sulfate",0,0,0,0,0
+" 1,7-Dimethyluric acid",0,0,0,0,0
+" (S)-3-hydroxylauric acid",0,0,0,0,0
+" Glutaric acid",0,0,0,0,0
+" Quinic acid",0,0,-0.26668,0,0
+" 2,3,4,6-Tetrahydroxy-5-oxohexanoic acid",0,0,0,0,0
+" Niacinamide",0,0,0,0,-0.086691
+" Arachidic Acid",0,0,0,0,0
